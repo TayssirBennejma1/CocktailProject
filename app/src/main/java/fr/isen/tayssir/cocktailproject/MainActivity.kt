@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import fr.isen.tayssir.cocktailproject.screens.CategoriesScreen
 import fr.isen.tayssir.cocktailproject.screens.DetailCocktailScreen
+import fr.isen.tayssir.cocktailproject.screens.DrinksScreen
 import fr.isen.tayssir.cocktailproject.ui.theme.CocktailProjectTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,8 +22,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CocktailProjectTheme {
-                CategoriesScreen(
-                    onCategoryClick = {}
+                DrinksScreen(
+                    category = "Cocktail",
+                    onDrinkClick = {}
                 )
             }
         }
