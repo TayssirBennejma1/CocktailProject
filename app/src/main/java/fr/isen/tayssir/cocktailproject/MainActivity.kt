@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import fr.isen.tayssir.cocktailproject.screens.CategoriesScreen
 import fr.isen.tayssir.cocktailproject.screens.DetailCocktailScreen
 import fr.isen.tayssir.cocktailproject.ui.theme.CocktailProjectTheme
 
@@ -20,7 +21,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CocktailProjectTheme {
-                DetailCocktailScreen()
+                CategoriesScreen(
+                    onCategoryClick = {}
+                )
             }
         }
     }
