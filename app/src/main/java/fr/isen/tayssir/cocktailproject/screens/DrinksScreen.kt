@@ -26,6 +26,12 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import fr.isen.tayssir.cocktailproject.data.DrinkPreview
 import fr.isen.tayssir.cocktailproject.network.ApiClient
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun DrinksScreen(
@@ -46,11 +52,15 @@ fun DrinksScreen(
     }
 
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .background(Color(0xFFF8F7FB))
+            .padding(16.dp)
     ) {
         Text(
             text = category,
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF2B2B2B)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -63,10 +73,14 @@ fun DrinksScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 6.dp)
+                            .padding(vertical = 7.dp)
                             .clickable {
                                 onDrinkClick(drink.id)
-                            }
+                            },
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFEDEAF5)
+                        )
                     ) {
                         Row(
                             modifier = Modifier.padding(12.dp)
@@ -74,14 +88,18 @@ fun DrinksScreen(
                             AsyncImage(
                                 model = drink.image,
                                 contentDescription = drink.name,
-                                modifier = Modifier.size(80.dp)
+                                modifier = Modifier
+                                    .size(85.dp)
+                                    .clip(RoundedCornerShape(14.dp))
                             )
 
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(14.dp))
 
                             Text(
                                 text = drink.name,
-                                style = MaterialTheme.typography.titleMedium
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF333333)
                             )
                         }
                     }

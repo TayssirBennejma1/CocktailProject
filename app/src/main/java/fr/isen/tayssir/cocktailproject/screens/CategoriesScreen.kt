@@ -22,6 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import fr.isen.tayssir.cocktailproject.data.Category
 import fr.isen.tayssir.cocktailproject.network.ApiClient
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun CategoriesScreen(
@@ -41,11 +46,15 @@ fun CategoriesScreen(
     }
 
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .background(Color(0xFFF8F7FB))
+            .padding(16.dp)
     ) {
         Text(
-            text = "Categories",
-            style = MaterialTheme.typography.headlineMedium
+            text = "Cocktail Categories",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF2B2B2B)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -58,14 +67,19 @@ fun CategoriesScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 6.dp)
+                            .padding(vertical = 7.dp)
                             .clickable {
                                 onCategoryClick(category.name)
-                            }
+                            },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFEDEAF5)
+                        )
                     ) {
                         Text(
                             text = category.name,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(18.dp),
+                            color = Color(0xFF333333)
                         )
                     }
                 }

@@ -16,7 +16,10 @@ import fr.isen.tayssir.cocktailproject.data.Cocktail
 import fr.isen.tayssir.cocktailproject.managers.FavoritesManager
 import fr.isen.tayssir.cocktailproject.network.ApiClient
 import androidx.compose.ui.graphics.Color
-
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +84,9 @@ fun DetailCocktailScreen(
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
+                    .background(Color(0xFFF8F7FB))
                     .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
                 CircularProgressIndicator()
             }
@@ -99,14 +104,17 @@ fun DetailCocktailScreen(
                         contentDescription = item.name,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(250.dp)
+                            .height(240.dp)
+                            .clip(RoundedCornerShape(20.dp))
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
                         text = item.name,
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF2B2B2B)
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -118,7 +126,11 @@ fun DetailCocktailScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFEDEAF5)
+                        )
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp)
