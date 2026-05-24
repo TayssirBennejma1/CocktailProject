@@ -4,31 +4,36 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.isen.tayssir.cocktailproject.screens.CategoriesScreen
 import fr.isen.tayssir.cocktailproject.screens.DetailCocktailScreen
 import fr.isen.tayssir.cocktailproject.screens.DrinksScreen
+import fr.isen.tayssir.cocktailproject.screens.MyFavoritesScreen
 import fr.isen.tayssir.cocktailproject.ui.theme.CocktailProjectTheme
+import fr.isen.tayssir.cocktailproject.ui.theme.SurfaceLight
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
-import fr.isen.tayssir.cocktailproject.screens.MyFavoritesScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,73 +46,60 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onRestart() {
-        super.onRestart()
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 }
 
 @Composable
 fun CocktailApp() {
     val navController = rememberNavController()
 
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {
-                        navController.navigate("random")
-                    },
-                    icon = {
-                        Icon(Icons.Default.Home, contentDescription = "Random")
-                    },
-                    label = {
-                        Text("Random")
-                    }
+            NavigationBar(
+                containerColor = SurfaceLight,
+                tonalElevation = 8.dp
+            ) {
+
+                val items = listOf(
+                    Triple("random", Icons.Default.Home, "Discover"),
+                    Triple("categories", Icons.Default.List, "Categories"),
+                    Triple("favorites", Icons.Default.Favorite, "Favorites")
                 )
 
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {
-                        navController.navigate("categories")
-                    },
-                    icon = {
-                        Icon(Icons.Default.List, contentDescription = "List")
-                    },
-                    label = {
-                        Text("List")
-                    }
-                )
+                items.forEach { (route, icon, label) ->
+                    val isSelected = currentRoute?.startsWith(route) == true
 
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {
-                        navController.navigate("favorites/${System.currentTimeMillis()}")
-                    },
-                    icon = {
-                        Icon(Icons.Default.Favorite, contentDescription = "Favorites")
-                    },
-                    label = {
-                        Text("Favorites")
-                    }
-                )
+                    NavigationBarItem(
+                        selected = isSelected,
+                        onClick = {
+                            if (!isSelected) {
+                                val finalRoute = if (route == "favorites") {
+                                    "favorites/${System.currentTimeMillis()}"
+                                } else {
+                                    route
+                                }
+
+                                navController.navigate(finalRoute) {
+                                    popUpTo("random") {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        },
+                        icon = { Icon(icon, contentDescription = label) },
+                        label = {
+                            Text(
+                                text = label,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -175,7 +167,6 @@ fun CocktailApp() {
                     }
                 )
             ) { backStackEntry ->
-
                 val refreshKey = backStackEntry.arguments?.getString("refreshKey") ?: ""
 
                 MyFavoritesScreen(
@@ -188,4 +179,3 @@ fun CocktailApp() {
         }
     }
 }
-
