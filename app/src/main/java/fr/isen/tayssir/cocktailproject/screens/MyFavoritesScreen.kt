@@ -24,6 +24,7 @@ import fr.isen.tayssir.cocktailproject.managers.FavoritesManager
 
 @Composable
 fun MyFavoritesScreen(
+    refreshKey: String,
     onDrinkClick: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -32,7 +33,7 @@ fun MyFavoritesScreen(
         mutableStateOf(FavoritesManager.getFavorites(context).toList())
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(refreshKey) {
         favorites = FavoritesManager.getFavorites(context).toList()
     }
 

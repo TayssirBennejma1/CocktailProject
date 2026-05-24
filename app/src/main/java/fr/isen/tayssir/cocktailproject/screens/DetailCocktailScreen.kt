@@ -15,6 +15,7 @@ import coil.compose.AsyncImage
 import fr.isen.tayssir.cocktailproject.data.Cocktail
 import fr.isen.tayssir.cocktailproject.managers.FavoritesManager
 import fr.isen.tayssir.cocktailproject.network.ApiClient
+import androidx.compose.ui.graphics.Color
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +68,8 @@ fun DetailCocktailScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
-                            contentDescription = "Favorite"
+                            contentDescription = "Favorite",
+                            tint = if (isFavorite) Color.Red else Color.Gray
                         )
                     }
                 }

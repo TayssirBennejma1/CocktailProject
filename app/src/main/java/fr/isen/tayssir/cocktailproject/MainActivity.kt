@@ -79,7 +79,7 @@ fun CocktailApp() {
                 NavigationBarItem(
                     selected = false,
                     onClick = {
-                        navController.navigate("favorites")
+                        navController.navigate("favorites/${System.currentTimeMillis()}")
                     },
                     icon = {
                         Icon(Icons.Default.Favorite, contentDescription = "Favorites")
@@ -147,8 +147,19 @@ fun CocktailApp() {
                 DetailCocktailScreen(drinkId = drinkId)
             }
 
-            composable("favorites") {
+            composable(
+                route = "favorites/{refreshKey}",
+                arguments = listOf(
+                    navArgument("refreshKey") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+
+                val refreshKey = backStackEntry.arguments?.getString("refreshKey") ?: ""
+
                 MyFavoritesScreen(
+                    refreshKey = refreshKey,
                     onDrinkClick = { drinkId ->
                         navController.navigate("detail/$drinkId")
                     }
