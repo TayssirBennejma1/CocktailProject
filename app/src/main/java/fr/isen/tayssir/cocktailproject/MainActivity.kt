@@ -28,6 +28,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
+import fr.isen.tayssir.cocktailproject.screens.MyFavoritesScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,7 +148,11 @@ fun CocktailApp() {
             }
 
             composable("favorites") {
-                Text("Favorites Screen")
+                MyFavoritesScreen(
+                    onDrinkClick = { drinkId ->
+                        navController.navigate("detail/$drinkId")
+                    }
+                )
             }
         }
     }
