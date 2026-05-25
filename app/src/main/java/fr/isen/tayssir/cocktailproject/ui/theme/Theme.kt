@@ -7,18 +7,21 @@ import androidx.compose.runtime.Composable
 private val SmoothColorScheme = lightColorScheme(
     primary = PrimarySmooth,
     secondary = SecondarySmooth,
+    tertiary = SoftGreen,
     background = BackgroundLight,
     surface = SurfaceLight,
+    surfaceVariant = SurfaceSoft,
     onPrimary = SurfaceLight,
+    onSecondary = TextDark,
     onBackground = TextDark,
-    onSurface = TextDark
+    onSurface = TextDark,
+    onSurfaceVariant = TextSecondary
 )
 
 @Composable
 fun CocktailProjectTheme(
     content: @Composable () -> Unit
 ) {
-
     MaterialTheme(
         colorScheme = SmoothColorScheme,
         typography = Typography,

@@ -2,8 +2,10 @@ package fr.isen.tayssir.cocktailproject.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,10 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,14 +35,22 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import fr.isen.tayssir.cocktailproject.data.DrinkPreview
 import fr.isen.tayssir.cocktailproject.network.ApiClient
+import fr.isen.tayssir.cocktailproject.ui.components.AppBackground
+import fr.isen.tayssir.cocktailproject.ui.components.CenterLoading
+import fr.isen.tayssir.cocktailproject.ui.components.EmptyState
+import fr.isen.tayssir.cocktailproject.ui.components.PremiumCard
+import fr.isen.tayssir.cocktailproject.ui.components.ScreenHeader
+import fr.isen.tayssir.cocktailproject.ui.components.SmallStat
 import fr.isen.tayssir.cocktailproject.ui.theme.PrimarySmooth
 import fr.isen.tayssir.cocktailproject.ui.theme.SecondarySmooth
 import fr.isen.tayssir.cocktailproject.ui.theme.SurfaceLight
 import fr.isen.tayssir.cocktailproject.ui.theme.TextDark
+import fr.isen.tayssir.cocktailproject.ui.theme.TextSecondary
 
 @Composable
 fun DrinksScreen(
@@ -49,86 +59,144 @@ fun DrinksScreen(
 ) {
     var drinks by remember { mutableStateOf<List<DrinkPreview>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var hasError by remember { mutableStateOf(false) }
+    var search by remember { mutableStateOf("") }
 
     LaunchedEffect(category) {
+        isLoading = true
+        hasError = false
         try {
             drinks = ApiClient.apiService.getDrinksByCategory(category).drinks ?: emptyList()
         } catch (e: Exception) {
-            e.printStackTrace()
+            hasError = true
         }
         isLoading = false
     }
 
-    val gradientBackground = Brush.verticalGradient(
-        colors = listOf(
-            SecondarySmooth.copy(alpha = 0.2f),
-            MaterialTheme.colorScheme.background
-        )
-    )
+    val filteredDrinks = remember(drinks, search) {
+        if (search.isBlank()) drinks else drinks.filter { it.name.contains(search, ignoreCase = true) }
+    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(gradientBackground)
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-    ) {
-        Text(
-            text = category,
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.ExtraBold,
-            color = TextDark
-        )
+    AppBackground(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 18.dp)
+        ) {
+            ScreenHeader(
+                title = category,
+                subtitle = "Découvre les meilleures recettes de cette catégorie."
+            )
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = PrimarySmooth)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                SmallStat(value = drinks.size.toString(), label = "cocktails", modifier = Modifier.weight(1f))
+                SmallStat(value = filteredDrinks.size.toString(), label = "résultats", modifier = Modifier.weight(1f))
             }
-        } else {
-            LazyColumn {
-                items(drinks) { drink ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .clickable { onDrinkClick(drink.id) },
-                        shape = RoundedCornerShape(22.dp),
-                        colors = CardDefaults.elevatedCardColors(
-                            containerColor = SurfaceLight
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            AsyncImage(
-                                model = drink.image,
-                                contentDescription = drink.name,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(90.dp)
-                                    .clip(RoundedCornerShape(18.dp))
-                            )
 
-                            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                            Text(
-                                text = drink.name,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = TextDark,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
+            OutlinedTextField(
+                value = search,
+                onValueChange = { search = it },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                placeholder = { Text("Rechercher un cocktail") },
+                shape = RoundedCornerShape(22.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimarySmooth,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedContainerColor = SurfaceLight,
+                    unfocusedContainerColor = SurfaceLight,
+                    cursorColor = PrimarySmooth
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            when {
+                isLoading -> CenterLoading()
+                hasError -> EmptyState("⚠️", "Chargement impossible", "Vérifie ta connexion puis réessaie.")
+                filteredDrinks.isEmpty() -> EmptyState("🔎", "Aucun résultat", "Essaie avec un autre nom de cocktail.")
+                else -> LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    contentPadding = PaddingValues(bottom = 24.dp)
+                ) {
+                    items(filteredDrinks) { drink ->
+                        DrinkItem(drink = drink, onClick = { onDrinkClick(drink.id) })
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DrinkItem(drink: DrinkPreview, onClick: () -> Unit) {
+    PremiumCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .clip(RoundedCornerShape(24.dp))
+            ) {
+                AsyncImage(
+                    model = drink.image,
+                    contentDescription = drink.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(Color.Transparent, Color.Black.copy(alpha = 0.32f))
+                            )
+                        )
+                )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = drink.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = TextDark,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Voir la recette complète",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary
+                )
+            }
+
+            Surface(
+                shape = RoundedCornerShape(50.dp),
+                color = SecondarySmooth.copy(alpha = 0.22f)
+            ) {
+                Text(
+                    text = "Open",
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = PrimarySmooth,
+                    fontWeight = FontWeight.ExtraBold
+                )
             }
         }
     }
